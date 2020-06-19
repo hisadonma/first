@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+
+    <title>JSONPを用いたwikipedia内検索</title>
+</head>
+<body>
+    <h1>wikipedia<br>検索エンジン</h1>
+    <form id ="search">
+        <input id = "keyword" name="keyword" type="text" required>
+        <button type="button" id = "btn">検索</button>
+    </form>
+    <button type="button" id = "btn_back">←戻る</button>
+    <button type="button" id = "btn_go">進む→</button>
+    <div id="output">
+
+    </div>
+    <script>
+
+        var btn =document.getElementById('btn');
+        var keyword= document.getElementById('keyword');
+        var url_array=[];
+        var i =0;
+
+        var callback_func = function(data) {
+        var json = data.query.search;
+        var html = '';
+        for (var i=0; i<json.length; i++) {
+        html += '<h2><a href="https:-//ja.wikipedia.org/wiki/' + json[i].title + '">' + json[i].title + '</a></h2>';
+        html += '<div class="excerpt"><p>' + json[i].snippet + '</p></div>';
+        }
+            document.getElementById('output').innerHTML = html;
+        };
+
+
+        document.getElementById('btn_back').addEventListener('click',function()
+        {
+            if(i>1)
+            {
+              var script = document.createElement('script');
+              i-=2;
+              script.src = 'https://ja.wikipedia.org/w/api.php?format=json&action=query&list=search&srsearch=' + url_array[i] + '&callback=callback_func';
+              document.body.appendChild(script);
+              i++;
+            }
+        });
+        document.getElementById('btn_go').addEventListener('click',function()
+        {
+          if(i<url_array.length)
+          {
+            var script = document.createElement('script');
+            script.src = 'https://ja.wikipedia.org/w/api.php?format=json&action=query&list=search&srsearch=' + url_array[i] + '&callback=callback_func';
+
+            document.body.appendChild(script);
+            i++;
+          }
+        });
+
+
+        btn.addEventListener('click',function()
+        {
+            if(keyword.value !="" && url_array[i-1] != keyword.value)
+            {
+              var script = document.createElement('script');
+              url_array[i]=keyword.value;
+              script.src = 'https://ja.wikipedia.org/w/api.php?format=json&action=query&list=search&srsearch=' + url_array[i] + '&callback=callback_func'
+              document.body.appendChild(script);
+              i++;
+            }
+        });
+
+</script>
+
+</body>
+</html>
